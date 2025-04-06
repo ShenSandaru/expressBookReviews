@@ -54,21 +54,82 @@ public_users.get('/isbn/:isbn',function (req, res) {
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+public_users.get('/author/:author', function (req, res) {
+    try {
+        const author = req.params.author;
+        const bookKeys = Object.keys(books);
+        const matchingBooks = bookKeys
+            .map(key => books[key])
+            .filter(book => book.author.toLowerCase() === author.toLowerCase());
+        
+        if (matchingBooks.length > 0) {
+            const formattedBooks = JSON.stringify(matchingBooks, null, 2);
+            res.setHeader('Content-Type', 'application/json');
+            return res.status(200).send(formattedBooks);
+        } else {
+            return res.status(404).json({
+                message: "No books found for the given author"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error retrieving books by author",
+            error: error.message
+        });
+    }
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  
+  try {
+    const title = req.params.title;
+    const bookKeys = Object.keys(books);
+    const matchingBooks = bookKeys
+        .map(key => books[key])
+        .filter(book => book.title.toLowerCase() === title.toLowerCase());
+
+    if (matchingBooks.length > 0) {
+        const formattedBooks = JSON.stringify(matchingBooks, null, 2);
+        res.setHeader('Content-Type', 'application/json');
+        return res.status(200).send(formattedBooks);
+    } else {
+        return res.status(404).json({
+            message: "No books found for the given title"
+        });
+    }
+} catch (error) {
+    return res.status(500).json({
+        message: "Error retrieving books by title",
+        error: error.message
+    });
+  }
+
 });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  
+  try {
+    const isbn = req.params.isbn;
+    const book = books[isbn];
+
+    if (book) {
+      const formattedReviews = JSON.stringify(book.reviews, null, 2);
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(200).send(formattedReviews);
+    } else {
+      return res.status(404).json({
+        message: "Book not found for the given ISBN"
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error retrieving book reviews",
+      error: error.message
+    });
+    }
+  
 });
 
 module.exports.general = public_users;
