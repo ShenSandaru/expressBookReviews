@@ -38,8 +38,30 @@ regd_users.post("/login", (req, res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  try {
+      const isbn = req.params.isbn;
+      const review = req.query.review; // Review from query parameter
+      const username = req.user.username; // From JWT via index.js middleware
+
+      // Validate review input
+      if (!review) {
+          return res.status(400).json({ message: "Review content is required" });
+      }
+
+      // Check if book exists
+      if (!books[isbn]) {
+          return res.status(404).json({ message: "Book not found" });
+      }
+
+      // Add or modify review
+      books[isbn].reviews[username] = review; // Overwrites if user already reviewed, adds if new
+      return res.status(200).json({
+          message: "Review added/updated successfully",
+          reviews: books[isbn].reviews
+      });
+  } catch (error) {
+      return res.status(500).json({ message: "Error adding review", error: error.message });
+  }
 });
 
 module.exports.authenticated = regd_users;
