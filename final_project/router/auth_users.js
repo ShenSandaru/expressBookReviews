@@ -64,6 +64,33 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   }
 });
 
+//Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+  try {
+      const isbn = req.params.isbn;
+      const username = req.user.username; // From JWT via index.js middleware
+
+      // Check if book exists
+      if (!books[isbn]) {
+          return res.status(404).json({ message: "Book not found" });
+      }
+
+      // Check if user has a review to delete
+      if (!books[isbn].reviews[username]) {
+          return res.status(404).json({ message: "No review found for this user on this book" });
+      }
+
+      // Delete the user's review
+      delete books[isbn].reviews[username];
+      return res.status(200).json({
+          message: "Review deleted successfully",
+          reviews: books[isbn].reviews
+      });
+  } catch (error) {
+      return res.status(500).json({ message: "Error deleting review", error: error.message });
+  }
+});
+
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
