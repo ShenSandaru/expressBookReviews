@@ -68,7 +68,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 regd_users.delete("/auth/review/:isbn", (req, res) => {
   try {
       const isbn = req.params.isbn;
-      const username = req.user.username; // From JWT via index.js middleware
+      const username = req.user.username; 
 
       // Check if book exists
       if (!books[isbn]) {
